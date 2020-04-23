@@ -15,8 +15,8 @@ TRAINING_BATCHES = 128
 PLAYS_PER_BATCH = 32
 BATCH_SIZE = 64
 EPOCHS = 64
-EVALUATE_COUNT = 5
-EVALUATE_SUCCESS_COUNT = 3
+EVALUATE_COUNT = 15
+EVALUATE_SUCCESS_COUNT = 9
 
 
 class TrainingDataFeed(object):
@@ -73,15 +73,15 @@ class TrainingDataFeed(object):
         with h5py.File(TRAINING_DATA_ARCHIVE_PATH, 'w') as out_file:
             out_file['batch_{}/states'.format(self.batch_count)] = np.array(self.states[-batch_sample_len:])
             out_file['batch_{}/policies'.format(self.batch_count)] = np.array(self.policies[-batch_sample_len:])
-            out_file['batch_{}/values'.format(self.batch_count)] = np.array(self.policies[-batch_sample_len:])
+            out_file['batch_{}/values'.format(self.batch_count)] = np.array(self.values[-batch_sample_len:])
             self.batch_count += 1
 
 
 def evaluate(model_1, model_2):
-    player_1 = player.ReversiZeroPlayer(-1, model_1)
-    player_2 = player.ReversiZeroPlayer(1, model_2)
     results = []
     for _ in range(EVALUATE_COUNT):
+        player_1 = player.ReversiZeroPlayer(-1, model_1)
+        player_2 = player.ReversiZeroPlayer(1, model_2)
         results.append(player.play(player_1, player_2))
     return results
 

@@ -8,7 +8,7 @@ from reversi_zero import player
 model_path = '/Volumes/ccschunk2/reversi_zero_models'
 model_1 = nn_model.NNModel()
 model_2 = nn_model.NNModel()
-model_2.load('/Users/Frost/Desktop/170.hdf5')
+model_2.load('/Users/Frost/Desktop/dump_model.hdf5')
 # player.self_play(model, verbose=2)
 player_1 = player.ReversiZeroPlayer(-1, model_2)
 player_2 = player.ReversiZeroPlayer(1, model_1)

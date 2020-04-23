@@ -78,5 +78,5 @@ class MCTSearch(object):
         policy = np.zeros(8 * 8, dtype=np.float32)
         for key, value in root.children.items():
             policy[key] = value.visit_count
-        policy, value = policy / np.sum(policy), root.action_value_sum
+        policy, value = policy / np.sum(policy), root.action_value
         return policy, value
