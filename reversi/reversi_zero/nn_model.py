@@ -29,6 +29,7 @@ class NNModel(object):
         cloned_model = keras.models.clone_model(self.model)
         cloned_self = NNModel()
         cloned_self.model = cloned_model
+        cloned_self._compile()
         return cloned_self
 
     def _create_model(self):
@@ -90,13 +91,16 @@ class NNModel(object):
 
         # Model assemble
         model = keras.models.Model(inputs=[model_input], outputs=[policy, value])
-        model.compile(
+        self.model = model
+        self._compile()
+    
+    def _compile(self):
+        self.model.compile(
             optimizer=keras.optimizers.Adadelta(),
             loss=[keras.losses.categorical_crossentropy, keras.losses.mean_squared_error],
             loss_weights=[0.5, 0.5],
             metrics=['accuracy']
         )
-        self.model = model
     
     @staticmethod
     def _conv_batchnorm(filters, kernel_size, padding='valid', kernel_regularizer=None, activation='linear'):
