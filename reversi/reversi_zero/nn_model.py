@@ -46,7 +46,7 @@ class NNModel(object):
             kernel_regularizer=keras.regularizers.l2(1e-4), 
             activation='relu'
         )(model_input)
-        for _ in range(8):
+        for _ in range(16):
             layer = NNModel._residual_block(
                 filters=128, 
                 kernel_size=(3, 3), 
@@ -98,8 +98,7 @@ class NNModel(object):
         self.model.compile(
             optimizer=keras.optimizers.Adadelta(),
             loss=[keras.losses.categorical_crossentropy, keras.losses.mean_squared_error],
-            loss_weights=[0.5, 0.5],
-            metrics=['accuracy']
+            loss_weights=[0.5, 0.5]
         )
     
     @staticmethod

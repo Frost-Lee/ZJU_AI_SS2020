@@ -54,7 +54,7 @@ class TrainingDataFeed(object):
             np.rot90(states, k=2, axes=(1, 2)), 
             np.rot90(states, k=3, axes=(1, 2))
         ])
-        policies = np.reshape(policies, (len(policies), 8, 8))
+        policies = np.reshape(policies, (policies.shape[0], 8, 8))
         policies = np.concatenate([
             policies,
             policies[:, ::-1, ::-1],
@@ -64,13 +64,13 @@ class TrainingDataFeed(object):
             np.rot90(policies, k=2, axes=(1, 2)), 
             np.rot90(policies, k=3, axes=(1, 2))
         ])
-        policies = np.reshape(policies, (len(policies), 8 * 8))
+        policies = np.reshape(policies, (policies.shape[0], 8 * 8))
         values = np.concatenate([values] * 7)
         return states, policies, values
 
     def dump(self):
         batch_sample_len = PLAYS_PER_BATCH * 8 * 8 - 4
-        with h5py.File(TRAINING_DATA_ARCHIVE_PATH, 'w') as out_file:
+        with h5py.File(TRAINING_DATA_ARCHIVE_PATH, 'a') as out_file:
             out_file['batch_{}/states'.format(self.batch_count)] = np.array(self.states[-batch_sample_len:])
             out_file['batch_{}/policies'.format(self.batch_count)] = np.array(self.policies[-batch_sample_len:])
             out_file['batch_{}/values'.format(self.batch_count)] = np.array(self.values[-batch_sample_len:])
@@ -88,17 +88,22 @@ def evaluate(model_1, model_2):
 
 best_model = nn_model.NNModel()
 data_feed = TrainingDataFeed()
+new_model_count = 0
 for batch_index in range(TRAINING_BATCHES):
+    print('begin training batch', batch_index, '.')
     for play_index in range(PLAYS_PER_BATCH):
         data_feed.collect(*player.self_play(best_model, verbose=1))
         print('\r', play_index, ' play finished.', end='')
     new_model = best_model.clone()
     new_model.fit(*data_feed.fetch(), batch_size=BATCH_SIZE, epochs=EPOCHS)
     new_model.save(MODEL_ARCHIVE_PATH)
+    print('evaluating models.')
     evaluate_result = evaluate(best_model, new_model)
     if [*map(lambda x: x[0], evaluate_result)].count(1) >= EVALUATE_SUCCESS_COUNT:
         best_model = new_model
+        new_model_count += 1
         best_model.save(BEST_MODEL_ARCHIVE_PATH)
-        print('new model won, use new model for generation.')
+        print('new model adopted.')
     else:
-        print('new model lose, still use previous model for generation.')
+        print('new model not adopted.')
+    print('model updated for', new_model_count, 'times.')

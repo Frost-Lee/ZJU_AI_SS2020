@@ -65,11 +65,10 @@ class MCTSearch(object):
             sub_board = copy.deepcopy(board)
             sub_root = root
             while sub_root.children is not None and len(sub_root.children) > 0:
-                action, child = max(sub_root.children.items(), key=lambda x: x[1].upper_confidence_bound(cpuct))
-                move_result = sub_board._move(utils.grid_coordinate(action), utils.player_char_identifier(child.player))
+                move, child = max(sub_root.children.items(), key=lambda x: x[1].upper_confidence_bound(cpuct))
+                move_result = sub_board._move(utils.grid_coordinate(move), utils.player_char_identifier(child.player))
                 assert move_result != False
                 sub_root = child
-            
             value = MCTSearch._expand_node(sub_root, sub_board, model)
             end_player = sub_root.player
             while sub_root is not None:
