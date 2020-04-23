@@ -34,10 +34,11 @@ class TrainingDataFeed(object):
         self.states += states
         self.policies += policies
         self.values += values
-        if len(self.states) > TRAINING_QUEUE_LENGTH * PLAYS_PER_BATCH:
-            self.states = self.states[-TRAINING_QUEUE_LENGTH * PLAYS_PER_BATCH:]
-            self.policies = self.policies[-TRAINING_QUEUE_LENGTH * PLAYS_PER_BATCH:]
-            self.values = self.values[-TRAINING_QUEUE_LENGTH * PLAYS_PER_BATCH:]
+        max_sample_len = TRAINING_QUEUE_LENGTH * PLAYS_PER_BATCH * 8 * 8 - 4
+        if len(self.states) > max_sample_len:
+            self.states = self.states[-max_sample_len:]
+            self.policies = self.policies[-max_sample_len:]
+            self.values = self.values[-max_sample_len:]
         if self.batch_play_count == PLAYS_PER_BATCH:
             self.dump()
             self.batch_play_count = 0
@@ -63,9 +64,9 @@ class TrainingDataFeed(object):
             np.rot90(policies, k=2, axes=(1, 2)), 
             np.rot90(policies, k=3, axes=(1, 2))
         ])
-        policies = np.reshape(len(policies, 8 * 8))
+        policies = np.reshape(policies, (len(policies), 8 * 8))
         values = np.concatenate([values] * 7)
-        return states, (policies, values)
+        return states, policies, values
 
     def dump(self):
         with h5py.File(TRAINING_DATA_ARCHIVE_PATH, 'w') as out_file:
@@ -95,6 +96,7 @@ for batch_index in range(TRAINING_BATCHES):
     evaluate_result = evaluate(best_model, new_model)
     if [*map(lambda x: x[0], evaluate_result)].count(1) >= EVALUATE_SUCCESS_COUNT:
         best_model = new_model
+        best_model.save(BEST_MODEL_ARCHIVE_PATH)
         print('new model won, use new model for generation.')
     else:
         print('new model lose, still use previous model for generation.')
