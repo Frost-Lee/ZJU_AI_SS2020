@@ -46,7 +46,7 @@ class NNModel(object):
             kernel_regularizer=keras.regularizers.l2(1e-4), 
             activation='relu'
         )(model_input)
-        for _ in range(6):
+        for _ in range(8):
             layer = NNModel._residual_block(
                 filters=128, 
                 kernel_size=(3, 3), 

@@ -13,8 +13,8 @@ BEST_MODEL_ARCHIVE_PATH = '/Users/Frost/Desktop/best_model.hdf5'
 TRAINING_QUEUE_LENGTH = 4
 TRAINING_BATCHES = 128
 PLAYS_PER_BATCH = 32
-BATCH_SIZE = 32
-EPOCHS = 128
+BATCH_SIZE = 64
+EPOCHS = 64
 EVALUATE_COUNT = 5
 EVALUATE_SUCCESS_COUNT = 3
 
@@ -69,10 +69,11 @@ class TrainingDataFeed(object):
         return states, policies, values
 
     def dump(self):
+        batch_sample_len = PLAYS_PER_BATCH * 8 * 8 - 4
         with h5py.File(TRAINING_DATA_ARCHIVE_PATH, 'w') as out_file:
-            out_file['batch_{}/states'.format(self.batch_count)] = np.array(self.states[-PLAYS_PER_BATCH:])
-            out_file['batch_{}/policies'.format(self.batch_count)] = np.array(self.policies[-PLAYS_PER_BATCH:])
-            out_file['batch_{}/values'.format(self.batch_count)] = np.array(self.policies[-PLAYS_PER_BATCH:])
+            out_file['batch_{}/states'.format(self.batch_count)] = np.array(self.states[-batch_sample_len:])
+            out_file['batch_{}/policies'.format(self.batch_count)] = np.array(self.policies[-batch_sample_len:])
+            out_file['batch_{}/values'.format(self.batch_count)] = np.array(self.policies[-batch_sample_len:])
             self.batch_count += 1
 
 
@@ -93,6 +94,7 @@ for batch_index in range(TRAINING_BATCHES):
         print('\r', play_index, ' play finished.', end='')
     new_model = best_model.clone()
     new_model.fit(*data_feed.fetch(), batch_size=BATCH_SIZE, epochs=EPOCHS)
+    new_model.save(MODEL_ARCHIVE_PATH)
     evaluate_result = evaluate(best_model, new_model)
     if [*map(lambda x: x[0], evaluate_result)].count(1) >= EVALUATE_SUCCESS_COUNT:
         best_model = new_model
@@ -100,5 +102,3 @@ for batch_index in range(TRAINING_BATCHES):
         print('new model won, use new model for generation.')
     else:
         print('new model lose, still use previous model for generation.')
-    if batch_index % 8 == 0 or batch_index == TRAINING_BATCHES - 1:
-        new_model.save(MODEL_ARCHIVE_PATH)
