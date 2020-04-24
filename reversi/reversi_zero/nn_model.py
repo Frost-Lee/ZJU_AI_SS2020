@@ -26,11 +26,9 @@ class NNModel(object):
         self.model = keras.models.load_model(path)
     
     def clone(self):
-        cloned_model = keras.models.clone_model(self.model)
-        cloned_self = NNModel()
-        cloned_self.model = cloned_model
-        cloned_self._compile()
-        return cloned_self
+        cloned_model = NNModel()
+        cloned_model.model.set_weights(self.model.get_weights())
+        return cloned_model
 
     def _create_model(self):
         model_input = keras.layers.Input(
