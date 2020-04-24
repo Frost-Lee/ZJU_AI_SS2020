@@ -41,9 +41,9 @@ class ReversiZeroPlayer(ReversiPlayer):
         self.model = model
         self.root = mct.MCTNode(None, 1, -self.color)
     
-    def play(self, board, strategy='determined'):
+    def play(self, board, strategy='determinestic'):
         policy, value = mct.MCTSearch.evaluate(self.root, board, self.model)
-        if strategy == 'determined':
+        if strategy == 'determinestic':
             move = np.argmax(policy)
         elif strategy == 'probabilistic':
             move = np.random.choice(policy.shape[0], p=policy)

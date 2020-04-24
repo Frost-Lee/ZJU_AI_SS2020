@@ -79,9 +79,10 @@ class TrainingDataFeed(object):
 
 def evaluate(model_1, model_2):
     results = []
-    for _ in range(EVALUATE_COUNT):
-        player_1 = player.ReversiZeroPlayer(-1, model_1)
-        player_2 = player.ReversiZeroPlayer(1, model_2)
+    for index in range(EVALUATE_COUNT):
+        root_player = 1 if index % 2 == 0 else -1
+        player_1 = player.ReversiZeroPlayer(root_player, model_1)
+        player_2 = player.ReversiZeroPlayer(-root_player, model_2)
         results.append(player.play(player_1, player_2))
     return results
 
