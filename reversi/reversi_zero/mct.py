@@ -68,7 +68,7 @@ class MCTSearch(object):
                 move_result = sub_board._move(utils.grid_coordinate(move), utils.player_char_identifier(child.player))
                 assert move_result != False
                 sub_root = child
-            value = -MCTSearch._expand_node(sub_root, sub_board, model)
+            value = MCTSearch._expand_node(sub_root, sub_board, model)
             end_player = sub_root.player
             while sub_root is not None:
                 sub_root.record_simulation(value if sub_root.player == end_player else -value)

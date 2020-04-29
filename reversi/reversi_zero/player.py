@@ -57,7 +57,6 @@ class ReversiZeroPlayer(ReversiPlayer):
             self.root.parent = None
         else:
             self.root = mct.MCTNode(None, 1, -self.color)
-        
 
 
 def play(player_1, player_2, verbose=0):
@@ -83,11 +82,11 @@ def play(player_1, player_2, verbose=0):
 def self_play(model, verbose=0):
     states, policies, player_queue = [], [], []
     board = Board()
+    player_1, player_2 = ReversiZeroPlayer(-1, model), ReversiZeroPlayer(1, model)
+    player_dict = {-1: player_1, 1: player_2}
     next_player = -1
-    player = ReversiZeroPlayer(next_player, model)
     while next_player != 0:
-        player.color = next_player
-        move, policy, value = player.play(board, 'probabilistic')
+        move, policy, value = player_dict[next_player].play(board, 'probabilistic')
         states.append(utils.board_state(board, next_player))
         policies.append(policy)
         move_result = board._move(utils.grid_coordinate(move), utils.player_char_identifier(next_player))
@@ -97,30 +96,7 @@ def self_play(model, verbose=0):
         elif verbose == 2:
             board.display()
         player_queue.append(next_player)
-        next_player = utils.next_player(board, next_player)[0]
-    winner = utils.winner_mapping(board.get_winner()[0])
+        next_player, _ = utils.next_player(board, next_player)
+    winner, _ = utils.winner_mapping(board.get_winner())
     values = [1 if player == winner else -1 if player == -winner else 0 for player in player_queue]
     return states, policies, values
-
-
-# def self_play(model, verbose=0):
-#     states, policies = [], []
-#     player_queue = []
-#     board = Board()
-#     mct_root = mct.MCTNode(None, 1, 1)
-#     while True:
-#         if utils.next_player(board, mct_root.player)[0] == 0:
-#             break
-#         policy, value = mct.MCTSearch.evaluate(mct_root, board, model)
-#         move = np.random.choice(policy.shape[0], p=policy)
-#         states.append(utils.board_state(board, mct_root.player))
-#         policies.append(policy)
-#         move_result = board._move(utils.grid_coordinate(move), utils.player_char_identifier(mct_root.children[move].player))
-#         assert move_result != False
-#         player_queue.append(mct_root.children[move].player)
-#         mct_root = mct_root.children[move]
-#         mct_root.parent = None
-#     winner, _ = board.get_winner()
-#     winner = -1 if winner == 0 else 1 if winner == 1 else 0
-#     values = [1 if player == winner else 0 if winner == 0 else -1 for player in player_queue]
-#     return np.array(states), np.array(policies), np.array(values)

@@ -15,8 +15,8 @@ TRAINING_BATCHES = 128
 PLAYS_PER_BATCH = 32
 BATCH_SIZE = 64
 EPOCHS = 32
-EVALUATE_COUNT = 15
-EVALUATE_SUCCESS_COUNT = 9
+EVALUATE_COUNT = 5
+EVALUATE_SUCCESS_COUNT = 3
 
 
 class TrainingDataFeed(object):
@@ -93,7 +93,7 @@ new_model_count = 0
 for batch_index in range(TRAINING_BATCHES):
     print('begin training batch', batch_index, '.')
     for play_index in range(PLAYS_PER_BATCH):
-        data_feed.collect(*player.self_play(best_model, verbose=1))
+        data_feed.collect(*player.self_play(best_model, verbose=0))
         print('\r', play_index, ' play finished.', end='')
     new_model = best_model.clone()
     new_model.fit(*data_feed.fetch(), batch_size=BATCH_SIZE, epochs=EPOCHS)
