@@ -66,9 +66,9 @@ def play(player_1, player_2, verbose=0):
     next_player = -1
     while next_player != 0:
         move, policy, value = player_dict[next_player].play(board)
-        player_dict[-next_player].notify(move)
         move_result = board._move(utils.grid_coordinate(move), utils.player_char_identifier(next_player))
         assert move_result != False
+        player_dict[-next_player].notify(move)
         if verbose == 1:
             print(utils.player_char_identifier(next_player), ' moved at ', utils.grid_coordinate(move))
         elif verbose == 2:
@@ -91,12 +91,13 @@ def self_play(model, verbose=0):
         policies.append(policy)
         move_result = board._move(utils.grid_coordinate(move), utils.player_char_identifier(next_player))
         assert move_result != False
+        player_dict[-next_player].notify(move)
         if verbose == 1:
             print(utils.player_char_identifier(next_player), ' moved at ', utils.grid_coordinate(move))
         elif verbose == 2:
             board.display()
         player_queue.append(next_player)
         next_player, _ = utils.next_player(board, next_player)
-    winner, _ = utils.winner_mapping(board.get_winner())
+    winner = utils.winner_mapping(board.get_winner()[0])
     values = [1 if player == winner else -1 if player == -winner else 0 for player in player_queue]
     return states, policies, values
