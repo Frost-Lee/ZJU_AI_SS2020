@@ -44,14 +44,14 @@ class MCTSearch(object):
         player, legal_moves = utils.next_player(board, root.player)
         if player == 0:
             winner = utils.winner_mapping(board.get_winner()[0])
-            if winner == player:
+            if winner == root.player:
                 return 1
-            elif winner == -player:
+            elif winner == -root.player:
                 return -1
             else:
                 return 0
         legal_moves = [*map(utils.flat_coordinate, legal_moves)]
-        policy, value = model.predict(utils.board_state(board, player))
+        policy, value = model.predict(utils.board_state(board, root.player))
         policy = [policy[move] for move in legal_moves]
         policy /= np.sum(policy)
         root.expand(player, legal_moves, policy)

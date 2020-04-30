@@ -28,7 +28,7 @@ class HumanPlayer(ReversiPlayer):
     
     def play(self, board):
         position = input('Give a position to place your piece.')
-        return position, None, None
+        return utils.flat_coordinate(position), None, None
     
     def notify(self, position):
         super().notify(position)
