@@ -42,7 +42,7 @@ class ReversiZeroPlayer(ReversiPlayer):
         self.root = mct.MCTNode(None, 1, -self.color)
     
     def play(self, board, strategy='determinestic'):
-        policy, value = mct.MCTSearch.evaluate(self.root, board, self.model)
+        policy, value = mct.MCTSearch.evaluate(self.root, board, self.model, with_noise=strategy=='probabilistic')
         if strategy == 'determinestic':
             move = np.argmax(policy)
         elif strategy == 'probabilistic':
@@ -73,7 +73,7 @@ def play(player_1, player_2, verbose=0):
             print(utils.player_char_identifier(next_player), ' moved at ', utils.grid_coordinate(move))
         elif verbose == 2:
             board.display()
-        next_player = utils.next_player(board, next_player)[0]
+        next_player, _ = utils.next_player(board, next_player)
     winner, difference = board.get_winner()
     winner = utils.winner_mapping(winner)
     return winner, difference

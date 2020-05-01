@@ -40,7 +40,7 @@ class MCTSearch(object):
         pass
     
     @staticmethod
-    def _expand_node(root, board, model):
+    def _expand_node(root, board, model, with_noise=False):
         player, legal_moves = utils.next_player(board, root.player)
         if player == 0:
             winner = utils.winner_mapping(board.get_winner()[0])
@@ -51,14 +51,19 @@ class MCTSearch(object):
             else:
                 return 0
         legal_moves = [*map(utils.flat_coordinate, legal_moves)]
-        policy, value = model.predict(utils.board_state(board, root.player))
-        policy = [policy[move] for move in legal_moves]
+        policy, value = model.predict(utils.board_state(board, player))
+        policy = np.array([policy[move] for move in legal_moves])
         policy /= np.sum(policy)
+        if with_noise:
+            noise_weight = 0.25
+            noise = np.random.dirichlet((0.03, 0.97), size=policy.shape)[:, 0]
+            policy = policy * (1.0 - noise_weight) + noise * noise_weight
+            policy /= np.sum(policy)
         root.expand(player, legal_moves, policy)
-        return value
+        return value if root.player == player else -value
 
     @staticmethod
-    def evaluate(root, board, model):
+    def evaluate(root, board, model, with_noise=False):
         cpuct = np.sqrt(config.MCT_SIMULATION_COUNT) / 8
         for _ in range(config.MCT_SIMULATION_COUNT):
             sub_board = copy.deepcopy(board)

@@ -94,7 +94,7 @@ class NNModel(object):
     
     def _compile(self):
         self.model.compile(
-            optimizer=keras.optimizers.Adam(),
+            optimizer=keras.optimizers.Adam(lr=1e-4),
             loss=[keras.losses.categorical_crossentropy, keras.losses.mean_squared_error],
             loss_weights=[0.5, 0.5]
         )
