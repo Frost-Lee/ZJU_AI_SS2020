@@ -100,6 +100,7 @@ for batch_index in range(TRAINING_BATCHES):
     new_model.save(MODEL_ARCHIVE_PATH)
     print('evaluating models.')
     evaluate_result = evaluate(best_model, new_model)
+    print('new model win:', evaluate_result.count(1))
     if [*map(lambda x: x[0], evaluate_result)].count(1) >= EVALUATE_SUCCESS_COUNT:
         best_model = new_model
         new_model_count += 1
