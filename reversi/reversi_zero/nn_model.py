@@ -23,7 +23,8 @@ class NNModel(object):
         self.model.save(path)
     
     def load(self, path):
-        self.model = keras.models.load_model(path)
+        loaded_model = keras.models.load_model(path)
+        self.model.set_weights(loaded_model.get_weights())
     
     def clone(self):
         cloned_model = NNModel()
@@ -94,7 +95,7 @@ class NNModel(object):
     
     def _compile(self):
         self.model.compile(
-            optimizer=keras.optimizers.SGD(learning_rate=1e-4, momentum=0.9),
+            optimizer=keras.optimizers.SGD(lr=1e-4, momentum=0.9),
             loss=[keras.losses.categorical_crossentropy, keras.losses.mean_squared_error],
             loss_weights=[0.5, 0.5]
         )
