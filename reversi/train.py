@@ -96,14 +96,13 @@ for batch_index in range(TRAINING_BATCHES):
     for play_index in range(PLAYS_PER_BATCH):
         data_feed.collect(*player.self_play(best_model, verbose=0))
         print('\r', play_index, ' play finished.', end='')
-    new_model = best_model.clone()
-    new_model.fit(*data_feed.fetch(), batch_size=BATCH_SIZE, epochs=EPOCHS)
-    new_model.save(MODEL_ARCHIVE_PATH)
+    current_model.fit(*data_feed.fetch(), batch_size=BATCH_SIZE, epochs=EPOCHS)
+    current_model.save(MODEL_ARCHIVE_PATH)
     print('evaluating models.')
-    evaluate_result = evaluate(best_model, new_model)
+    evaluate_result = evaluate(best_model, current_model)
     print('new model win:', [*map(lambda x: x[0], evaluate_result)].count(1))
     if [*map(lambda x: x[0], evaluate_result)].count(1) >= EVALUATE_SUCCESS_COUNT:
-        best_model = new_model
+        best_model = current_model.clone()
         new_model_count += 1
         best_model.save(BEST_MODEL_ARCHIVE_PATH)
         print('new model adopted.')
