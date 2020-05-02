@@ -88,6 +88,7 @@ def evaluate(model_1, model_2):
 
 
 best_model = nn_model.NNModel()
+current_model = best_model.clone()
 data_feed = TrainingDataFeed()
 new_model_count = 0
 for batch_index in range(TRAINING_BATCHES):
