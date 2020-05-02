@@ -26,7 +26,7 @@ class HumanPlayer(ReversiPlayer):
     def __init__(self, color):
         super().__init__(color)
     
-    def play(self, board):
+    def play(self, board, **kwargs):
         position = input('Give a position to place your piece.')
         return utils.flat_coordinate(position), None, None
     
@@ -41,12 +41,9 @@ class ReversiZeroPlayer(ReversiPlayer):
         self.model = model
         self.root = mct.MCTNode(None, 1, -self.color)
     
-    def play(self, board, strategy='determinestic'):
-        policy, value = mct.MCTSearch.evaluate(self.root, board, self.model, with_noise=strategy=='probabilistic')
-        if strategy == 'determinestic':
-            move = np.argmax(policy)
-        elif strategy == 'probabilistic':
-            move = np.random.choice(policy.shape[0], p=policy)
+    def play(self, board, with_noise=False, temperature=0.001):
+        policy, value = mct.MCTSearch.evaluate(self.root, board, self.model, with_noise=with_noise)
+        move = utils.choose_move(policy, temperature)
         self.root = self.root.children[move]
         self.root.parent = None
         return move, policy, value
@@ -59,13 +56,13 @@ class ReversiZeroPlayer(ReversiPlayer):
             self.root = mct.MCTNode(None, 1, -self.color)
 
 
-def play(player_1, player_2, verbose=0):
+def play(player_1, player_2, verbose=0, temperature=0.05):
     assert player_1.color != player_2.color
     board = Board()
     player_dict = {player_1.color: player_1, player_2.color: player_2}
     next_player = -1
     while next_player != 0:
-        move, policy, value = player_dict[next_player].play(board)
+        move, policy, value = player_dict[next_player].play(board, with_noise=False, temperature=temperature)
         move_result = board._move(utils.grid_coordinate(move), utils.player_char_identifier(next_player))
         assert move_result != False
         player_dict[-next_player].notify(move)
@@ -79,14 +76,14 @@ def play(player_1, player_2, verbose=0):
     return winner, difference
 
 
-def self_play(model, verbose=0):
+def self_play(model, verbose=0, temperature=0.001):
     states, policies, player_queue = [], [], []
     board = Board()
     player_1, player_2 = ReversiZeroPlayer(-1, model), ReversiZeroPlayer(1, model)
     player_dict = {-1: player_1, 1: player_2}
     next_player = -1
     while next_player != 0:
-        move, policy, value = player_dict[next_player].play(board, 'probabilistic')
+        move, policy, value = player_dict[next_player].play(board, with_noise=True, temperature=temperature)
         states.append(utils.board_state(board, next_player))
         policies.append(policy)
         move_result = board._move(utils.grid_coordinate(move), utils.player_char_identifier(next_player))

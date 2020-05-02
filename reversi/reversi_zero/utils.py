@@ -62,3 +62,9 @@ def winner_mapping(winner):
         return 1
     else:
         return 0
+
+def choose_move(policy, temperature):
+    policy = np.log(policy + 1e-10) / temperature
+    policy = np.exp(policy - np.max(policy))
+    policy = policy / np.sum(policy)
+    return np.random.choice(policy.size, p=policy)
