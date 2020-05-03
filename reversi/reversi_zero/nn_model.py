@@ -45,7 +45,7 @@ class NNModel(object):
             kernel_regularizer=keras.regularizers.l2(1e-4), 
             activation='relu'
         )(model_input)
-        for _ in range(8):
+        for _ in range(16):
             layer = NNModel._residual_block(
                 filters=128, 
                 kernel_size=(3, 3), 
@@ -119,16 +119,16 @@ class NNModel(object):
         def structure(input_tensor):
             residual = input_tensor
             layer = NNModel._conv_batchnorm(
-                filters=128, 
-                kernel_size=(3, 3), 
-                padding='same', 
+                filters=filters, 
+                kernel_size=kernel_size, 
+                padding=padding, 
                 kernel_regularizer=keras.regularizers.l2(1e-4),
                 activation='relu'
             )(input_tensor)
             layer = NNModel._conv_batchnorm(
-                filters=128, 
-                kernel_size=(3, 3), 
-                padding='same', 
+                filters=filters, 
+                kernel_size=kernel_size, 
+                padding=padding, 
                 kernel_regularizer=keras.regularizers.l2(1e-4),
             )(layer)
             layer = keras.layers.Add()([residual, layer])
