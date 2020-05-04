@@ -76,18 +76,20 @@ def play(player_1, player_2, verbose=0, temperature=0.05):
     return winner, difference
 
 
-def self_play(model, verbose=0, temperature=0.001):
+def self_play(model, verbose=0):
     states, policies, player_queue = [], [], []
     board = Board()
     player_1, player_2 = ReversiZeroPlayer(-1, model), ReversiZeroPlayer(1, model)
     player_dict = {-1: player_1, 1: player_2}
     next_player = -1
+    move_count = 0
     while next_player != 0:
-        move, policy, value = player_dict[next_player].play(board, with_noise=True, temperature=temperature)
+        move, policy, value = player_dict[next_player].play(board, with_noise=True, temperature=1 if move_count < 16 else 0.01)
         states.append(utils.board_state(board, next_player))
         policies.append(policy)
         move_result = board._move(utils.grid_coordinate(move), utils.player_char_identifier(next_player))
         assert move_result != False
+        move_count += 1
         player_dict[-next_player].notify(move)
         if verbose == 1:
             print(utils.player_char_identifier(next_player), ' moved at ', utils.grid_coordinate(move))
