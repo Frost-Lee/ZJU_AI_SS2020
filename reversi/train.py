@@ -83,7 +83,8 @@ def evaluate(model_1, model_2):
         root_player = 1 if index % 2 == 0 else -1
         player_1 = player.ReversiZeroPlayer(root_player, model_1)
         player_2 = player.ReversiZeroPlayer(-root_player, model_2)
-        results.append(player.play(player_1, player_2))
+        winner, difference = player.play(player_1, player_2)
+        results.append((1 if winner == root_player else -1 if winner == -root_player else 0, difference))
     return results
 
 
