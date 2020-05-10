@@ -3,7 +3,7 @@
 
 from func_timeout import func_timeout, FunctionTimedOut
 import datetime
-from board import Board
+from .board import Board
 from copy import deepcopy
 
 
