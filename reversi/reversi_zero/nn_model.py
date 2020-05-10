@@ -23,8 +23,9 @@ class NNModel(object):
         self.model.save(path)
     
     def load(self, path):
-        loaded_model = keras.models.load_model(path)
-        self.model.set_weights(loaded_model.get_weights())
+        self.model = keras.models.load_model(path)
+        # loaded_model = keras.models.load_model(path)
+        # self.model.set_weights(loaded_model.get_weights())
     
     def clone(self):
         cloned_model = NNModel()

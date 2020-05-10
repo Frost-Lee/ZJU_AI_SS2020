@@ -6,7 +6,7 @@ from reversi_zero import nn_model
 from reversi_zero import player
 from reversi_zero import utils
 
-EVALUATION_ROUNDS = 32
+EVALUATION_ROUNDS = 16
 
 def evaluate(model_1, model_2):
     results = []
