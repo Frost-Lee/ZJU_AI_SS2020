@@ -60,7 +60,7 @@ $$
 
 ![ct visualization](./report_figs/ct_visualization.jpeg)
 
-根据 contingency table，我们计算了模型对于每个类别分类的精确率（prevision）、召回率（recall）、F1 指标。相应结果见下表。每个单元格中的数值分别表示精确率 - 召回率 - F1 指标。
+根据 contingency table，我们计算了模型对于每个类别分类的精确率（precision）、召回率（recall）、F1 指标。相应结果见下表。每个单元格中的数值分别表示精确率 - 召回率 - F1 指标。
 
 |           |     Resnet-34      |     ResNet-50      |     ResNet-101     | Pretrained-ResNet-50 |
 | :-------: | :----------------: | :----------------: | :----------------: | :------------------: |
